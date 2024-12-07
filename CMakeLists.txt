@@ -14,8 +14,7 @@ FetchContent_Declare(ftxui
 )
 FetchContent_MakeAvailable(ftxui)
 
-target_link_libraries(wordly_tu
-        i
+target_link_libraries(wordly_tui
         PRIVATE ftxui::screen
         PRIVATE ftxui::dom
         PRIVATE ftxui::component
