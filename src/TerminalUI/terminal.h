@@ -75,28 +75,32 @@ namespace TerminalUI {
     };
 
     class Terminal {
-        std::optional<Pixel>** pixels;
         mutable std::optional<Pixel>** buffer;
         mutable bool first_frame_drawn = false;
 
         const char* reset = "\033[0m";
         void draw_pixel(std::optional<Pixel> pixel) const;
 
-        static Dimension get_terminal_dimensions();
+        static void hideCursor();
+        static void showCursor();
+
+        protected:
+            static Dimension get_terminal_dimensions();
+            std::optional<Pixel>** pixels;
 
         public:
             // better to use this, because calling sizeof on array of pixels is inefficient (and it's really a pointer, so there are other issue)
             Dimension dimensions;
 
             explicit Terminal(Dimension dimensions = get_terminal_dimensions());
-            void setPixel(Pixel pixel, Position position) const;
+
+        virtual void setPixel(Pixel pixel, Position position) const;
             void draw() const;
             void fresh_draw() const;
             void clear() const;
             // only for deallocating memory
             ~Terminal();
     };
-
 } // TerminalUI
 
 #endif //TERMINAL_H

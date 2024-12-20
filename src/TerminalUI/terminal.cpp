@@ -9,20 +9,15 @@
 namespace TerminalUI {
     Terminal::Terminal(const Dimension dimensions_) {
         // Hide cursor
-        std::cout << "\033[?25l";
+        hideCursor();
 
         dimensions = dimensions_;
         // set array size depending on dimensions provided in constructor parameters (for both pixels and buffer)
         pixels = new std::optional<Pixel>*[dimensions.height]; // set y-axis dimension
         buffer = new std::optional<Pixel>*[dimensions.height]; // set y-axis dimension
         for (int y = 0; y < dimensions.height; ++y) {
-            pixels[y] = new std::optional<Pixel>[dimensions.width]; // set x-axis dimension
-            buffer[y] = new std::optional<Pixel>[dimensions.width]; // set x-axis dimension
-            // because 'std::optional' doesn't automatically assign 'std::nullopt' when initializing array we need to do it manually
-            for (int x = 0; x < dimensions.width; ++x) {
-                pixels[y][x] = std::nullopt;
-                buffer[y][x] = std::nullopt;
-            }
+            pixels[y] = new std::optional<Pixel>[dimensions.width];
+            buffer[y] = new std::optional<Pixel>[dimensions.width];
         }
     }
 
@@ -42,10 +37,10 @@ namespace TerminalUI {
                     // here we can just swap pixel for new one (and update buffer)
                     buffer[y][x] = pixels[y][x];
 
-                    // Save cursor position
+                    // Save current cursor position
                     std::cout << "\033[s";
-                    // move cursor
-                    std::cout << "\033[" << y << ";" << x << "H";
+                    // move cursor to changed pixel
+                    std::cout << "\033[" << y << ";" << x + 1 << "H";
                     // print pixel
                     draw_pixel(pixels[y][x]);
                     // Restore cursor position
@@ -65,7 +60,7 @@ namespace TerminalUI {
             }
         }
 
-        // Save cursor position
+        // Save initial cursor position
         std::cout << "\033[s";
 
         for (int y = 0; y < dimensions.height; ++y) {
@@ -90,11 +85,17 @@ namespace TerminalUI {
     }
 
     Terminal::~Terminal() {
-        // Deallocate memory to prevent memory leaks
-        for (int i = 0; i < sizeof(pixels); ++i) {
-            delete[] pixels[i]; // deallocate inside array (x-axis)
+        // Deallocate pixels array
+        for (int y = 0; y < dimensions.height; ++y) {
+            delete[] pixels[y]; // Delete each row (x-axis)
         }
-        delete[] pixels; // deallocate array itself (y-axis)
+        delete[] pixels; // Delete the outer array (y-axis)
+
+        // Deallocate buffer array
+        for (int y = 0; y < dimensions.height; ++y) {
+            delete[] buffer[y]; // Delete each row (x-axis)
+        }
+        delete[] buffer; // Delete the outer array (y-axis)
 
         // Shows cursor
         std::cout << "\033[?25h";
@@ -132,4 +133,31 @@ namespace TerminalUI {
 
         return { w.ws_row, w.ws_col };
     }
+
+    #ifdef _WIN32
+    #include <windows.h>
+        void Terminal::hideCursor() {
+            HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+            CONSOLE_CURSOR_INFO cursorInfo;
+            GetConsoleCursorInfo(consoleHandle, &cursorInfo);
+            cursorInfo.bVisible = false;
+            SetConsoleCursorInfo(consoleHandle, &cursorInfo);
+        }
+        void Terminal::showCursor() {
+            HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+            CONSOLE_CURSOR_INFO cursorInfo;
+            GetConsoleCursorInfo(consoleHandle, &cursorInfo);
+            cursorInfo.bVisible = true;
+            SetConsoleCursorInfo(consoleHandle, &cursorInfo);
+        }
+    #else
+        void Terminal::hideCursor() {
+            std::cout << "\033[?25l";
+            std::cout.flush();
+        }
+        void Terminal::showCursor() {
+            std::cout << "\033[?25h";
+            std::cout.flush();
+        }
+    #endif
 }
