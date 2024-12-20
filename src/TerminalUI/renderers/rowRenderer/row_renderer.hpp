@@ -2,6 +2,7 @@
 #define ROW_COMPONENT_H
 
 #include <map>
+#include <vector>
 
 #include "../../renderer.h"
 
@@ -56,7 +57,7 @@ namespace TerminalUI {
                 if (rows.empty()) { continue; }
                 // Find the row with the biggest pixel count
                 unsigned int absolute_row_width;
-                auto widest_row_iter = std::max_element(rows.begin(), rows.end(),
+                auto widest_row_iter = max_element(rows.begin(), rows.end(),
                     [](const auto& a, const auto& b) {
                         return std::get<0>(a).size() < std::get<0>(b).size(); // Compare pixel vector sizes
                     });

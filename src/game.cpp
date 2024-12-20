@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <random>
 
@@ -102,7 +103,7 @@ class WordlyTUI {
                     /* enter */ if (input == 10 && word_input.size() == 5) {
                         const std::string current_word(word_input.begin(), word_input.end());
                         // check if word exists
-                        if (std::count(english_5_word_dictionary.begin(), english_5_word_dictionary.end(), current_word) ) {
+                        if (count(english_5_word_dictionary.begin(), english_5_word_dictionary.end(), current_word) ) {
                             // add word as guess
                             guessed_words.emplace_back(current_word);
                             word_input.clear();
