@@ -42,7 +42,20 @@ jobs:
           cyg-get make gcc-core gcc-g++
         shell: cmd
 
+      - name: Configure project (Windows using Cygwin)
+        if: runner.os == 'Windows'
+        run: |
+          C:\cygwin\bin\bash -lc "cmake -S . -B build -G 'Unix Makefiles' -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++"
+        shell: bash
+
+      - name: Build project (Windows using Cygwin)
+        if: runner.os == 'Windows'
+        run: |
+          C:\cygwin\bin\bash -lc "cmake --build build"
+        shell: bash  
+
       - name: Configure project
+        if: runner.os != 'Windows'
         run: |
           cmake -S . -B build -G "Unix Makefiles"
         shell: bash
