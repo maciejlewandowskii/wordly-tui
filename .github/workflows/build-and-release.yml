@@ -36,16 +36,9 @@ jobs:
 
       - name: Set up Cygwin (Windows only)
         if: runner.os == 'Windows'
-        run: |
-          # Install Cygwin via Chocolatey
-          choco install cygwin --params "/InstallDir:C:\\cygwin" --yes
-          
-          # Add Cygwin to PATH
-          echo "C:\\cygwin\\bin" >> $GITHUB_PATH
-          
-          # Install required packages using Cygwin setup
-          curl -o setup-x86_64.exe https://cygwin.com/setup-x86_64.exe
-          ./setup-x86_64.exe -q -P make,gcc-core,gcc-g++
+        uses: cygwin/cygwin-install-action@master
+        with:
+          packages: make gcc-core gcc-g++
 
       - name: Configure project (Windows using Cygwin)
         if: runner.os == 'Windows'
