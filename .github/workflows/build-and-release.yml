@@ -39,31 +39,27 @@ jobs:
         run: |
           choco install cygwin --params "/InstallDir:C:\\cygwin" --yes
           choco install cyg-get --yes
-          cyg-get make gcc-core gcc-g++
-        shell: cmd
+          C:\\cygwin\\bin\\bash -lc "cyg-get make gcc-core gcc-g++"
 
       - name: Configure project (Windows using Cygwin)
         if: runner.os == 'Windows'
         run: |
-          C:\cygwin\bin\bash -lc "cmake -S . -B build -G 'Unix Makefiles' -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++"
-        shell: bash
+          C:\\cygwin\\bin\\bash -lc "cmake -S . -B build -G 'Unix Makefiles' -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++"
 
       - name: Build project (Windows using Cygwin)
         if: runner.os == 'Windows'
         run: |
-          C:\cygwin\bin\bash -lc "cmake --build build"
-        shell: bash  
+          C:\\cygwin\\bin\\bash -lc "cmake --build build"
 
-      - name: Configure project
+      - name: Configure project (Linux/macOS)
         if: runner.os != 'Windows'
         run: |
           cmake -S . -B build -G "Unix Makefiles"
-        shell: bash
 
-      - name: Build project
+      - name: Build project (Linux/macOS)
+        if: runner.os != 'Windows'
         run: |
           cmake --build build
-        shell: bash
 
       - name: Package binaries
         run: |
