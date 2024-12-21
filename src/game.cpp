@@ -65,11 +65,13 @@ class WordlyTUI {
                     row_renderer->addRow("You should have guess: " + word_to_guess, TerminalUI::RowPosition {TerminalUI::VerticalPosition::MIDDLE, TerminalUI::HorizontalPosition::CENTER, TerminalUI::RowAlignment::CENTER});
                     row_renderer->addRow("", TerminalUI::RowPosition {TerminalUI::VerticalPosition::MIDDLE, TerminalUI::HorizontalPosition::CENTER, TerminalUI::RowAlignment::CENTER});
                     row_renderer->addRow("try again later...", TerminalUI::RowPosition {TerminalUI::VerticalPosition::MIDDLE, TerminalUI::HorizontalPosition::CENTER, TerminalUI::RowAlignment::CENTER});
+                    row_renderer->addRow("press 'Q' to go back to menu", TerminalUI::RowPosition {TerminalUI::VerticalPosition::BOTTOM, TerminalUI::HorizontalPosition::CENTER, TerminalUI::RowAlignment::CENTER});
                     break;
                 case AppState::Congratulation:
                     row_renderer->clearScreen();
                     row_renderer->addRow("YOU WIN!", TerminalUI::RowPosition {TerminalUI::VerticalPosition::MIDDLE, TerminalUI::HorizontalPosition::CENTER, TerminalUI::RowAlignment::CENTER});
                     row_renderer->addRow("You were able to guess word in " + std::to_string(guessed_words.size()) + " tries.", TerminalUI::RowPosition {TerminalUI::VerticalPosition::MIDDLE, TerminalUI::HorizontalPosition::CENTER, TerminalUI::RowAlignment::CENTER});
+                    row_renderer->addRow("press 'Q' to go back to menu", TerminalUI::RowPosition {TerminalUI::VerticalPosition::BOTTOM, TerminalUI::HorizontalPosition::CENTER, TerminalUI::RowAlignment::CENTER});
                     break;
                 case AppState::InGame:
                     render_in_game_screen(row_renderer);
@@ -114,6 +116,20 @@ class WordlyTUI {
                             // too much guesses you lose
                             if (guessed_words.size() > 5) { game_state = AppState::GameOver; }
                         }
+                    }
+                    break;
+                case AppState::Congratulation: case AppState::GameOver:
+                    if (input == 113) {
+                        // chose random word to guess
+                        std::random_device random_device;
+                        std::mt19937 engine{random_device()};
+                        std::uniform_int_distribution<int> dist(0, this->words_to_guess.size() - 1);
+                        this->word_to_guess = words_to_guess[dist(engine)];
+                        // clear vars
+                        word_input.clear();
+                        guessed_words.clear();
+
+                        game_state = AppState::InMenu;
                     }
                     break;
                 case AppState::Settings:

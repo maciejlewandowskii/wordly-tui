@@ -81,7 +81,7 @@ namespace TerminalUI {
                         // rows with bottom vertical positions have different y-axis calculations
                         if (group.first == VerticalPosition::BOTTOM) {
                             // BOTTOM position rows
-                            position.y += (rows.size() - 1) - row_idx;
+                            position.y -= rows.size() - row_idx;
                         }
                         else { position.y += row_idx; }
 
