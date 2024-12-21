@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <deque>
 #include <fstream>
+#include <sstream>
 #include <iostream>
 #include <random>
 

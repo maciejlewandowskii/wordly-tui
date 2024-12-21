@@ -3,7 +3,7 @@
 #include "src/game.cpp"
 
 
-[[noreturn]] int main(void) {
+int main(void) {
     std::vector<std::string> english_5_word_dictionary = {
          #include "src/resources/English.db"
     };
