@@ -1,4 +1,6 @@
 #include <algorithm>
+#include <deque>
+#include <fstream>
 #include <iostream>
 #include <random>
 
@@ -120,6 +122,16 @@ class WordlyTUI {
                     break;
                 case AppState::Congratulation: case AppState::GameOver:
                     if (input == 113) {
+                        // save results to file
+                        std::ofstream scoreboard("scoreboard.db", std::ios::app);
+                        if (scoreboard) {
+                            const auto now = std::chrono::system_clock::now();
+                            const auto timestamp = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
+                            const std::string line = std::to_string(timestamp) + ";" + word_to_guess + ";" + std::to_string(guessed_words.size()) + ";";
+                            scoreboard << line << std::endl;
+
+                            scoreboard.close();
+                        }
                         // chose random word to guess
                         std::random_device random_device;
                         std::mt19937 engine{random_device()};
@@ -132,9 +144,10 @@ class WordlyTUI {
                         game_state = AppState::InMenu;
                     }
                     break;
-                case AppState::Settings:
-                    break;
-                case AppState::Scoreboard:
+                case AppState::Settings: case AppState::Scoreboard:
+                    if (input == 113) {
+                        game_state = AppState::InMenu;
+                    }
                     break;
             }
         }
@@ -286,11 +299,67 @@ class WordlyTUI {
             }
         }
 
-        void render_settings_screen(TerminalUI::RowRenderer<WordlyTUI> *row_renderer) {
-
+        static void render_settings_screen(TerminalUI::RowRenderer<WordlyTUI> *row_renderer) {
+            row_renderer->clearScreen();
+            row_renderer->addRow("Nothing Yet..", TerminalUI::RowPosition {TerminalUI::VerticalPosition::MIDDLE, TerminalUI::HorizontalPosition::CENTER, TerminalUI::RowAlignment::CENTER});
+            row_renderer->addRow("", TerminalUI::RowPosition {TerminalUI::VerticalPosition::MIDDLE, TerminalUI::HorizontalPosition::CENTER, TerminalUI::RowAlignment::CENTER});
+            row_renderer->addRow("press 'Q' to go back to menu", TerminalUI::RowPosition {TerminalUI::VerticalPosition::BOTTOM, TerminalUI::HorizontalPosition::CENTER, TerminalUI::RowAlignment::CENTER});
         }
 
-        void render_scoreboard_screen(TerminalUI::RowRenderer<WordlyTUI> *row_renderer) {
+        static void render_scoreboard_screen(TerminalUI::RowRenderer<WordlyTUI> *row_renderer) {
+            row_renderer->clearScreen();
+            std::ifstream scoreboard("scoreboard.db");
+            if (scoreboard) {
+                std::deque<std::string> lastLines;
+                std::string line;
 
+                // Read the file line by line
+                while (std::getline(scoreboard, line)) {
+                    lastLines.push_back(line);
+                    // Keep only the last 10 lines
+                    if (lastLines.size() > 10) {
+                        lastLines.pop_front();
+                    }
+                }
+
+                // reverse lastLines, so the newest guesses are on top
+                std::ranges::reverse(lastLines);
+
+                row_renderer->addRow("Yours last 10 scores:", TerminalUI::RowPosition {TerminalUI::VerticalPosition::TOP, TerminalUI::HorizontalPosition::CENTER, TerminalUI::RowAlignment::CENTER});
+                row_renderer->addRow("", TerminalUI::RowPosition {TerminalUI::VerticalPosition::TOP, TerminalUI::HorizontalPosition::CENTER, TerminalUI::RowAlignment::CENTER});
+                for (const auto &line : lastLines) {
+                    // Split the line
+                    std::stringstream ss(line);
+                    std::string timestampStr, word_to_guess, guessed_word_count;
+                    std::getline(ss, timestampStr, ';');
+                    std::getline(ss, word_to_guess, ';');
+                    std::getline(ss, guessed_word_count, ';');
+
+                    // Convert timestamp to readable format
+                    long long timestamp = std::stoll(timestampStr);
+                    std::time_t time = static_cast<std::time_t>(timestamp);
+                    char buffer[100];
+                    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", std::localtime(&time));
+
+                    std::string record;
+                    if (std::stoi(guessed_word_count) > 5) {
+                        record = static_cast<std::string>(buffer) + ", Not guessed '" + word_to_guess + "'";
+                    }
+                    else {
+                        record = static_cast<std::string>(buffer) + ", Guessed '" + word_to_guess + "' in " + guessed_word_count + " tries.";
+                    }
+                    row_renderer->addRow(record, TerminalUI::RowPosition {
+                        TerminalUI::VerticalPosition::TOP,
+                        TerminalUI::HorizontalPosition::CENTER,
+                        TerminalUI::RowAlignment::CENTER
+                    });
+                }
+
+                scoreboard.close();
+            } else {
+                row_renderer->addRow("Can't open scoreboard file!", TerminalUI::RowPosition {TerminalUI::VerticalPosition::MIDDLE, TerminalUI::HorizontalPosition::CENTER, TerminalUI::RowAlignment::CENTER});
+            }
+
+            row_renderer->addRow("press 'Q' to go back to menu", TerminalUI::RowPosition {TerminalUI::VerticalPosition::BOTTOM, TerminalUI::HorizontalPosition::CENTER, TerminalUI::RowAlignment::CENTER});
         }
 };
