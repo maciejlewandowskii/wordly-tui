@@ -4,7 +4,7 @@
 #include <string>
 #include <thread>
 #include <unistd.h>
-#include <bits/chrono.h>
+#include <chrono>
 #include <sys/fcntl.h>
 
 #include "terminal.h"

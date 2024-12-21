@@ -4,6 +4,7 @@ add_compile_options(-include cstddef) # Compile option to make it work on MacOs
 project(wordly_tui)
 
 set(CMAKE_CXX_STANDARD 26)
+set(CMAKE_ASM_STANDARD_REQUIRED ON)
 
 add_executable(wordly_tui
     main.cpp
