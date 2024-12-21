@@ -43,12 +43,12 @@ jobs:
       - name: Configure project (Windows using Cygwin)
         if: runner.os == 'Windows'
         run: |
-          bash -lc "cd $(cygpath -u $GITHUB_WORKSPACE) && cmake -S . -B build -G 'Unix Makefiles' -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++"
+          bash -lc "cd /cygdrive/c/$(echo $GITHUB_WORKSPACE | sed 's/://') && cmake -S . -B build -G 'Unix Makefiles' -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++"
 
       - name: Build project (Windows using Cygwin)
         if: runner.os == 'Windows'
         run: |
-          bash -lc "cd $(cygpath -u $GITHUB_WORKSPACE) && cmake --build build"
+          bash -lc "cd /cygdrive/c/$(echo $GITHUB_WORKSPACE | sed 's/://') && cmake --build build"
 
       - name: Configure project (Linux/macOS)
         if: runner.os != 'Windows'
