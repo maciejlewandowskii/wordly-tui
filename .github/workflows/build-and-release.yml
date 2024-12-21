@@ -37,22 +37,25 @@ jobs:
       - name: Set up Cygwin (Windows only)
         if: runner.os == 'Windows'
         run: |
+          # Install Cygwin via Chocolatey
           choco install cygwin --params "/InstallDir:C:\\cygwin" --yes
+          
+          # Add Cygwin to PATH
           echo "C:\\cygwin\\bin" >> $GITHUB_PATH
-          C:\\cygwin\\bin\\bash -lc "apt-cyg install wget || echo 'wget already installed'"
-          C:\\cygwin\\bin\\bash -lc "wget -O /usr/bin/cyg-get https://raw.githubusercontent.com/transcode-open/apt-cyg/master/apt-cyg"
-          C:\\cygwin\\bin\\bash -lc "chmod +x /usr/bin/cyg-get"
-          C:\\cygwin\\bin\\bash -lc "cyg-get make gcc-core gcc-g++"
+          
+          # Install required packages using Cygwin setup
+          curl -o setup-x86_64.exe https://cygwin.com/setup-x86_64.exe
+          ./setup-x86_64.exe -q -P make,gcc-core,gcc-g++
 
       - name: Configure project (Windows using Cygwin)
         if: runner.os == 'Windows'
         run: |
-          C:\\cygwin\\bin\\bash -lc "cmake -S . -B build -G 'Unix Makefiles' -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++"
+          bash -lc "cmake -S . -B build -G 'Unix Makefiles' -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++"
 
       - name: Build project (Windows using Cygwin)
         if: runner.os == 'Windows'
         run: |
-          C:\\cygwin\\bin\\bash -lc "cmake --build build"
+          bash -lc "cmake --build build"
 
       - name: Configure project (Linux/macOS)
         if: runner.os != 'Windows'
