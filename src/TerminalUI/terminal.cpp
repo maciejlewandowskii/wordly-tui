@@ -3,7 +3,9 @@
 #include <iostream>
 #include <ostream>
 #include <stdexcept>
-#include <sys/ioctl.h>
+#ifndef _WIN32
+    #include <sys/ioctl.h>
+#endif
 #include <unistd.h>
 
 namespace TerminalUI {
