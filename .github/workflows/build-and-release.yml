@@ -38,7 +38,11 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           choco install cygwin --params "/InstallDir:C:\\cygwin" --yes
-          choco install cyg-get --yes
+          echo "::add-path::C:\\cygwin\\bin"
+          echo "::add-path::C:\\cygwin\\usr\\local\\bin"
+          C:\\cygwin\\bin\\bash -lc "wget -O cyg-get https://raw.githubusercontent.com/transcode-open/apt-cyg/master/apt-cyg"
+          C:\\cygwin\\bin\\bash -lc "install cyg-get /bin/"
+          C:\\cygwin\\bin\\bash -lc "chmod +x /bin/cyg-get"
           C:\\cygwin\\bin\\bash -lc "cyg-get make gcc-core gcc-g++"
 
       - name: Configure project (Windows using Cygwin)
