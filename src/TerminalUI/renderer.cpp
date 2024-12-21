@@ -1,5 +1,6 @@
 #include "renderer.h"
 
+
 namespace TerminalUI {
     Renderer::Renderer(std::optional<Dimension> dimensions) : Terminal(dimensions.value_or(get_terminal_dimensions())) {
         setupNonBlockingInput(); // for handling keyboard interrupts (TODO: not really needed for all Renderers, make it optional)
@@ -21,6 +22,7 @@ namespace TerminalUI {
 
             // set pixels from specific renderer, and draw them on screen
             setFrame();
+
             // print frame rate from previous calculation
             if (showFrameRate && fps_str.has_value()) {
                 for (unsigned int i = 0; i < fps_str.value().length(); ++i) {
@@ -31,10 +33,11 @@ namespace TerminalUI {
                              }, TerminalUI::Position{0, i});
                 }
             }
+
             // draw pixels on the screen
             draw();
 
-            // artificially slow down rendering to wanted framerate
+            // artificially slow down rendering to wanted framerate (TODO: not really working, fix needed)
             if (frameRate.has_value()) {
                 const auto frame_render_end_timestamp = std::chrono::high_resolution_clock::now();
                 const auto current_frame_render_time = std::chrono::duration_cast<std::chrono::nanoseconds>(

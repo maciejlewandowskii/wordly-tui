@@ -1,8 +1,3 @@
-//
-// Created by Maciej Lewandowski on 12/11/24.
-// Simple TUI library for rendering pixels / characters into terminal
-//
-
 #ifndef TERMINAL_H
 #define TERMINAL_H
 #include <optional>
@@ -41,7 +36,7 @@ namespace TerminalUI {
         "\033[43m"  // YELLOW
     };
 
-    // Helper function to retrieve the corresponding escape code for the color
+    // Helper function to retrieve the corresponding escape code for the colors
     constexpr const char* get_foreground_escape_code(Color color) {
         return ForegroundColorCodes[static_cast<int>(color)];
     }
@@ -50,7 +45,7 @@ namespace TerminalUI {
     }
 
     struct Pixel {
-        // change will only appear when rendering character, ('character' field needs to be set)
+        // change of foreground color will only appear when rendering character, ('character' field needs to be set)
         Color foreground_color = Color::WHITE;
         Color background_color = Color::BLACK;
         // This option will render character instead of full pixel, character color will be set to foreground_color
@@ -89,7 +84,7 @@ namespace TerminalUI {
             std::optional<Pixel>** pixels;
 
         public:
-            // better to use this, because calling sizeof on array of pixels is inefficient (and it's really a pointer, so there are other issue)
+            // better to use this helper struct, because calling sizeof on array of pixels is inefficient (and it's really a pointer, so there are other issue)
             Dimension dimensions;
 
             explicit Terminal(Dimension dimensions = get_terminal_dimensions());
@@ -99,7 +94,7 @@ namespace TerminalUI {
             void fresh_draw() const;
             void clear() const;
             // only for deallocating memory
-            ~Terminal();
+            virtual ~Terminal();
     };
 } // TerminalUI
 

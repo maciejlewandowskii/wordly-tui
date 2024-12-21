@@ -27,8 +27,7 @@ namespace TerminalUI {
      *  Struct for positioning row onto terminal
      *  for making it easier, it just supports handful predefined positions.
      *  Because rows will be rendered top to bottom depending on insert order (in their positions containers),
-     *  to not allow for overlying, addRow() methods will use detectPositionOverlap() method to determinate,
-     *  if new Row is not overlapping with different rows (mostly onto different positions) and also with terminal dimensions.
+     *  overlap is possible, so be aware of that.
      */
     struct RowPosition {
         VerticalPosition vertical_position;
@@ -42,8 +41,8 @@ namespace TerminalUI {
      *  the need for manually adding, removing pixels from screen. In a way its abstraction of pixel rendering.
      *  But it still allows you to insert a row of Pixels, and thanks for that you can insert multicolor
      *  characters or pixels anywhere on the screen.
-     *  But if you need more control you can allways call setPixel() method, be aware that it doesn't have overlapping check!
-     *  It also has component system that creates for you ready-to-use elements of UI, for example: list, frame etc...
+     *  But if you need more control you can allways call setPixel() method.
+     *  It also has component system that creates for you ready-to-use elements of UI, for example: list, frame etc... (for now just list)
      */
     template <typename T>
     class RowRenderer : Renderer {
@@ -78,7 +77,11 @@ namespace TerminalUI {
 
                         // calculate offsets
                         position.x += pixel;
-                        // rows with bottom vertical positions have different y-axis calculations
+                        /*
+                         *  Rows with bottom vertical positions have different y-axis calculations,
+                         *  basically you still want top to bottom order depending on insert order,
+                         *  so 'container' needs to be offset from bottom with height of said 'container'
+                         */
                         if (group.first == VerticalPosition::BOTTOM) {
                             // BOTTOM position rows
                             position.y -= rows.size() - row_idx;
@@ -194,7 +197,7 @@ namespace TerminalUI {
                               "appInterrupts must be a member function pointer with the correct signature");
             }
 
-            // for more control, but WITHOUT overlapping check! (because Terminal object is private)
+            // for more control (because Terminal object is private)
             void setPixel(Pixel pixel, Position position) const override {
                 Renderer::setPixel(pixel, position);
             }

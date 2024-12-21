@@ -16,8 +16,8 @@ namespace TerminalUI {
         pixels = new std::optional<Pixel>*[dimensions.height]; // set y-axis dimension
         buffer = new std::optional<Pixel>*[dimensions.height]; // set y-axis dimension
         for (int y = 0; y < dimensions.height; ++y) {
-            pixels[y] = new std::optional<Pixel>[dimensions.width];
-            buffer[y] = new std::optional<Pixel>[dimensions.width];
+            pixels[y] = new std::optional<Pixel>[dimensions.width]; // set x-axis dimension
+            buffer[y] = new std::optional<Pixel>[dimensions.width]; // set x-axis dimension
         }
     }
 
@@ -27,7 +27,7 @@ namespace TerminalUI {
     }
 
     void Terminal::draw() const {
-        // check if first frame was drawn, if not just draw entire frame
+        // check if first frame was drawn, if not draw it
         if (!first_frame_drawn)  { fresh_draw(); return; }
 
         // find changes in new frame (compare pixels with buffer)
@@ -98,7 +98,7 @@ namespace TerminalUI {
         delete[] buffer; // Delete the outer array (y-axis)
 
         // Shows cursor
-        std::cout << "\033[?25h";
+        showCursor();
     }
 
 

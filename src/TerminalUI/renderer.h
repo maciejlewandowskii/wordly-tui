@@ -1,9 +1,11 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
 #include <optional>
-#include <cstdio>
-#include <chrono>
+#include <string>
 #include <thread>
+#include <unistd.h>
+#include <bits/chrono.h>
+#include <sys/fcntl.h>
 
 #include "terminal.h"
 
@@ -11,9 +13,7 @@
 #ifdef _WIN32
     #include <conio.h>  // Windows-specific for _kbhit and _getch
 #else
-    #include <unistd.h>
     #include <termios.h>
-    #include <fcntl.h>
 #endif
 
 namespace TerminalUI {
@@ -48,7 +48,7 @@ namespace TerminalUI {
              */
             [[noreturn]] virtual void render(bool showFrameRate = false, std::optional<unsigned int> frameRate = std::nullopt);
 
-            virtual ~Renderer();
+            ~Renderer() override;
     };
 }
 
